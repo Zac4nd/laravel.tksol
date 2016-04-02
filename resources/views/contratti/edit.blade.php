@@ -11,17 +11,18 @@
 @endsection
 
 @section('main-content')
-    @if (count($errors) > 0)
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <div class="col-md-4">
+        @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+
         <div class="row">
             <div class="box box-primary">
                 {!! Form::model($contratto, ['url' => 'contratti/'.$contratto->id, 'method' => 'PATCH' ]) !!}
@@ -33,18 +34,14 @@
     <div class="col-md-8">
         <div class="row">
             <div class="col-md-12">
-                <div class="box box-primary">
-                    <?php  $listinoInterventi = $contratto->listinoProdotti; ?>
-                    @include('contratti.partials.interventiTable')
-                </div>
+                <?php  $listinoInterventi = $contratto->listinoInterventi; ?>
+                @include('contratti.partials.interventiTable')
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="box box-primary">
-                    <?php $listinoProdotti = $contratto->listinoInterventi; ?>
-                    @include('contratti.partials.prodottiTable')
-                </div>
+                <?php $listinoProdotti = $contratto->listinoProdotti; ?>
+                @include('contratti.partials.prodottiTable')
             </div>
         </div>
     </div>
