@@ -45,11 +45,9 @@ class InterventiRequest extends Request {
             case 'PATCH':
             {
                 return [
-                    'listino_id'    => 'required|numeric',
-                    'attivita_id'   => 'required|numeric',
-                    'consulente_id' => 'required|numeric',
-                    'data_start'    => 'required|date',
-                    'data_end'      => 'required|date',
+                    'progetto_id' => 'required|numeric',
+                    'listino_id'  => 'required|numeric',
+                    'attivita_id' => 'required|numeric',
                 ];
             }
             default:
