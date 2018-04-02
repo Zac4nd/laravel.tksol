@@ -15,12 +15,12 @@
             font-family: Calibri;
         }
 
-        table {
+        table#tRDAlist {
             border-collapse: collapse;
-            border: 1pt solid grey;
+            border: 0pt solid grey;
         }
 
-        table th {
+        table#tRDAlist th {
             font-size: 10pt;
             color: white;
             background-color: #4f8fb5;
@@ -28,17 +28,17 @@
             border: 1pt solid grey;
         }
 
-        table td {
+        table#tRDAlist td {
             font-size: 10pt;
             border: 1pt solid grey;
             padding: 5pt;
         }
 
-        table tr:nth-child(even) {
+        table#tRDAlist tr:nth-child(even) {
             background-color: #f0f0f0;
         }
 
-        table tr:nth-child(odd) {
+        table#tRDAlist tr:nth-child(odd) {
             background-color: white;
         }
 
@@ -53,18 +53,18 @@
         }
 
         div.rdaHEAD {
-            padding: 5pt;
         }
 
         .rdaHEAD div {
             display: inline;
         }
 
-        #vTotale, #vRighe {
+        #selezione{
             text-align: left;
             border: 0pt;
             font-size: 12pt;
-            width: 150px;
+            width: 50px;
+            background: transparent;
         }
 
         #tRDAlist tr:hover {
@@ -78,17 +78,14 @@
         #dRDAlist {
             height: 90%;
             overflow-Y: auto;
-            border-bottom: 0.1pt solid grey;
-            border-top: 0.1pt solid grey;
-            border-right: 0.1pt solid grey;
         }
     </style>
 
     <div class='rdaHEAD'>
-        <div>Filtro: <input size='40' type='text' id='filtro'></div>
-
-        <div>Righe selezionate: <input id='vRighe' size='10' readonly value='0'/></div>
-
+        <div>Filtro: <input size='30' type='text' id='filtro'></div>
+        <div>Da: <input size='10' type='text' id='di' class="datepicker"></div>
+        <div>A: <input size='10' type='text' id='df' class="datepicker"></div>
+        <div>Righe selezionate: <input id="selezione" readonly value=''/></div>
         <div>Valutazione:
             <input type='button' class="btn btn-success" onclick='autorizza();' value='Si autorizza'/>
             <input type='button' class="btn btn-danger" onclick='rifiuta();' value='Si rifiuta'/>
@@ -104,6 +101,7 @@
                     <th>Data Intervento</th>
                     <th>Consulente</th>
                     <th>Cliente</th>
+                    <th>Link</th>
                     <th>Progetto</th>
                     <th>Ore Lavorate</th>
                     <th style="width:180px">Approvate</th>
@@ -113,9 +111,23 @@
                     @foreach($daApprovare as $intervento)
                         <tr class='intervento' data-id_intervento='{{$intervento->id}}'>
                             <td style='padding:1pt'><input name='selettoreRDA' type='checkbox'></td>
-                            <td>{{$intervento->data}}</td>
+                            <td class="date">{{$intervento->data}}</td>
                             <td>{{$intervento->user->consulente->nominativo}}</td>
                             <td>{{$intervento->contratto->cliente->ragione_sociale}}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default"
+                                            onClick="location.href='{{ action('InterventoController@show',$intervento->id) }}'"
+                                            title="Visualizza Intervento">
+                                        <i class="fa fa-calendar"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-default"
+                                            onClick="window.open('{{action('InterventoController@stampa',$intervento->id)}}','_blank', 'height=800,width=600')"
+                                            title="Apri Rapportino">
+                                        <i class="fa fa-file-pdf-o"></i>
+                                    </button>
+                                </div>
+                            </td>
                             <td>{{$intervento->contratto->progetto->nome}}</td>
                             <td class="ore_lavorate">{{$intervento->ore_lavorate}}</td>
                             <td>
@@ -138,7 +150,9 @@
 @endsection
 @section('page_scripts')
     <script>
-
+        $(function() {
+            calcolaTotale();
+        });
         $("input[name='valoreRDA']").keyup(function () {
             var $prima = $(this).val();
             $(this).val($prima.replace(/[^\d.]/g, ''));
@@ -174,22 +188,38 @@
             });
         }
 
+        $('.datepicker').on('changeDate', function () {
+            $("#filtro").keyup();
+        });
 
         $("#filtro").keyup(function () {
             var i = 0;
-            $("table").find('tr').each(function () {
+            $("table#tRDAlist").find('tr').each(function () {
                 i++;
                 var x = false;
+                var datechk = false;
                 if ($(this).children('th').length == 0) {
                     //se checkato mantieni visibile
                     if ($(this).find("input[name='selettoreRDA']").iCheck('update')[0].checked) x = true;
-                    //altrimenti verifica testo
+                    //altrimenti verifica testo e data
                     else {
+                        if ($('#di').val()) di = moment($('#di').val(), 'DD/MM/YYYY');
+                        else di = moment('2000-01-01');
+                        if ($('#df').val()) df = moment($('#df').val(), 'DD/MM/YYYY');
+                        else df = moment('2900-01-01');
                         $(this).find('td').each(function () {
-                            var str = $(this).text();
-                            str = str.toLowerCase();
-                            var n = str.indexOf($("#filtro").val().toLowerCase());
-                            if (n != -1) x = x || true;
+                            var el = $(this);
+                            if (el.hasClass('date')) {
+                                eldt = moment(el.text(), 'DD/MM/YYYY');
+                                if (eldt.isSameOrAfter(di) & eldt.isSameOrBefore(df)) datechk = true;
+                            }
+                            if (datechk) {
+                                var str = el.text();
+                                str = str.toLowerCase();
+                                var n = str.indexOf($("#filtro").val().toLowerCase());
+                                if (n != -1) x = x || true;
+                            }
+                            else x = false;
                         })
                     }
                     //rendi visibile o nascondi di conseguenza
@@ -197,6 +227,7 @@
                 }
             })
         });
+
 
         $('#selezionaTutti').on('ifChecked', function () {
             $("input[name='selettoreRDA']:visible").not(this).iCheck('check');//.prop('checked', this.checked);
