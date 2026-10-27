@@ -1,0 +1,94 @@
+<div class="box">
+    <div class="box-header">
+        <h3 class="box-title">Listino Prodotto</h3>
+        <div class="box-tools">
+            <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                <a class="btn btn-default"
+                        href="{{ action('ContrattoProdottoController@create',$contratto->id) }}"
+                        title="Aggiungi Nuovo ">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </div>
+            <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                <div class="input-group input-group-sm" style="width: 150px;">
+                    <input type="text" id="prodotti_search" name="table_search" class="form-control pull-right"
+                           placeholder="Search">
+
+                    <div class="input-group-btn">
+                        <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-body" style="min-height: 300px;">
+        <table id="listinoProdotti"
+               class="table table-striped table-bordered dataTables_wrapper form-inline dt-bootstrap" cellspacing="0"
+               width="100%">
+            <thead>
+            <tr>
+                <td>Opzioni</td>
+                <td>Prodotto</td>
+                <td>Importo</td>
+                <td>Fatturazione</td>
+                <td>Tipo</td>
+                <td>Scheda</td>
+                <td>Data</td>
+                <td>Fee</td>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($listinoProdotti as $listinoProdotto)
+                <tr>
+                    <td>
+                        <a href="{{ action('ContrattoProdottoController@edit',[$contratto->id,$listinoProdotto->id]) }}"
+                           data-skin="skin-blue" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-edit"></i></a>
+                        @if(Auth::User()->consulente->tipo == 'Partner' OR Auth::User()->consulente->tipo == 'Admin')
+                            <a href="{{ action('ContrattoProdottoController@destroy',[$contratto->id,$listinoProdotto->id]) }}"
+                               data-method="DELETE" data-confirm="Eliminare il prodotto dal contratto?"
+                               data-token="{{csrf_token()}}" data-skin="skin-blue" class="btn btn-danger btn-xs"><i
+                                        class="glyphicon glyphicon-trash"></i></a>
+                        @endif
+
+                    </td>
+                    <td>{{ $listinoProdotto->prodotto->nome }}</td>
+                    <td class="pull-right">
+                        <i class="glyphicon glyphicon-euro"></i> {{$listinoProdotto->importo}}
+                    </td>
+                    <td>{{ $listinoProdotto->softwarehouse->ragione_sociale }}</td>
+                    <td>{{ $listinoProdotto->tipo_vendita }}</td>
+                    <td>@if($listinoProdotto->scheda)<a href='{{ $listinoProdotto->scheda }}'>Scheda di Vendita</a>@endif</td>
+                    <td>{{ $listinoProdotto->scadenza }}</td>
+                    <td>{{ $listinoProdotto->fee }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@section('page_scripts')
+    <script>
+        $(document).ready(function () {
+            var clientiTable = $('#listinoProdotti').DataTable({
+                "scrollY": "200px",
+                "scrollCollapse": false,
+                "paging": false,
+                "lengthChange": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "columnDefs": [
+                    {"width": "80px", "targets": 0}
+                ],
+                "fnDrawCallback": function () {
+                    $('#listinoProdotti').removeClass('hide');
+                }
+
+            });
+            $('#prodotti_search').keyup(function () {
+                clientiTable.search($(this).val()).draw();
+            })
+            $('.dataTables_filter').hide();
+        });
+    </script>
+@append

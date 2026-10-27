@@ -1,0 +1,79 @@
+<?php
+if (isset($consulente))
+{
+    $sesso = $consulente->sesso;           
+} else
+{
+    $sesso = '';
+}
+?>
+<div class="box-body">
+    <div class="form-group">
+        {!! Form::text('CDC', null,['class'=>'form-control', 'id'=>'CDC', 'placeholder'=>'CDC']) !!}
+        {!! Form::text('area', null,['class'=>'form-control', 'id'=>'area', 'placeholder'=>'Area']) !!}
+        {!! Form::text('CV', null,['class'=>'form-control', 'id'=>'CV', 'placeholder'=>'CV']) !!}
+        {!! Form::text('sito', null,['class'=>'form-control', 'id'=>'sito', 'placeholder'=>'sito']) !!}
+    </div>
+    <div class="form-group">
+        {!! Form::text('codice_fiscale', null,['class'=>'form-control', 'id'=>'codice_fiscale', 'placeholder'=>'Codice fiscale']) !!}
+        {!! Form::text('cognome', null,['class'=>'form-control', 'id'=>'cognome', 'placeholder'=>'Cognome']) !!}
+        {!! Form::text('nome', null,['class'=>'form-control', 'id'=>'nome', 'placeholder'=>'Nome']) !!}
+        {!! Form::email('email', null,['class'=>'form-control', 'id'=>'email', 'placeholder'=>'Email']) !!}
+        <input type="hidden" name="user_email" value="{{$consulente->user->email or ''}}"/>
+    </div>
+    <div class="form-group">
+        {!! Form::select('sesso',
+            array('Non Specificato' => 'Non Specificato','Uomo' => 'Uomo','Donna' => 'Donna'),
+            $sesso,
+            ['id'=>'sesso','style'=>'width:100%', 'class'=>'form-control'])
+        !!}
+        {!! Form::text('data_nascita', null,['class'=>'form-control', 'id'=>'data_nascita', 'placeholder'=>'Data Nascita']) !!}
+    </div>
+    <div class="form-group">
+        {!! Form::text('data_assunzione', null,['class'=>'form-control', 'id'=>'data_assunzione', 'placeholder'=>'Data Assunzine']) !!}
+        {!! Form::text('data_cessazione', null,['class'=>'form-control', 'id'=>'data_cessazione', 'placeholder'=>'Data Cessazione']) !!}
+        {!! Form::text('rapporto', null,['class'=>'form-control', 'id'=>'rapporto', 'placeholder'=>'Rapporto']) !!}
+    </div>
+    <div class="form-group">
+        {!! Form::text('indirizzo', null,['class'=>'form-control', 'id'=>'indirizzo', 'placeholder'=>'Indirizzo']) !!}
+        {!! Form::text('citta', null,['class'=>'form-control', 'id'=>'citta', 'placeholder'=>'Città']) !!}
+        {!! Form::text('provincia', null,['class'=>'form-control', 'id'=>'provincia', 'placeholder'=>'Provincia']) !!}
+        {!! Form::text('cap', null,['class'=>'form-control', 'id'=>'cap', 'placeholder'=>'CAP']) !!}
+    </div>
+    <div class="form-group">
+        {!! Form::text('telefono', null,['class'=>'form-control', 'id'=>'telefono', 'placeholder'=>'Telefono']) !!}
+        {!! Form::text('telefono2', null,['class'=>'form-control', 'id'=>'telefono2', 'placeholder'=>'2° telefono']) !!}
+    </div>
+    <div class="form-group">
+        {!! Form::text('mobile', null,['class'=>'form-control', 'id'=>'mobile', 'placeholder'=>'Mobile']) !!}
+        {!! Form::text('mobile2', null,['class'=>'form-control', 'id'=>'mobile2', 'placeholder'=>'2°mobile']) !!}
+    </div>
+    <div class="form-group">
+        {!! Form::text('partita_iva', null,['class'=>'form-control', 'id'=>'partita_iva', 'placeholder'=>'Partita IVA']) !!}
+    </div>
+    @if(Auth::User()->consulente->tipo == 'Partner' OR Auth::User()->consulente->tipo == 'Admin')
+        <div class="form-group">
+
+            <select class="form-control select2 select2-hidden-accessible" name="tipo" style="width: 100%;"
+                    tabindex="-1" aria-hidden="true">
+                <option value="{{ $consulente->tipo or  '' }}"> {{ $consulente->tipo or  'Tipo' }}</option>
+                <option value="Partner">Partner</option>
+                <option value="Senior">Senior</option>
+                <option value="Junior">Junior</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+    @endif
+</div><!-- /.box-body -->
+
+<div class="box-footer">
+    @if(isset($consulente))
+        @if(Auth::User()->consulente->tipo == 'Partner' OR Auth::User()->consulente->tipo == 'Admin' OR Auth::User()->consulente->id == $consulente->id)
+            <button type="submit" class="btn btn-primary">Submit</button>
+        @endif
+    @else
+        @if(Auth::User()->consulente->tipo == 'Partner' OR Auth::User()->consulente->tipo == 'Admin')
+            <button type="submit" class="btn btn-primary">Submit</button>
+        @endif
+    @endif
+</div>

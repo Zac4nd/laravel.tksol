@@ -1,0 +1,51 @@
+name: tksol-legacy
+services:
+  nginx:
+    image: nginx:1.26-alpine
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-8088}:80"
+    volumes:
+      - ./app:/var/www/html:ro
+      - ./data/storage:/var/www/html/storage:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [app]
+    networks: [frontend]
+    restart: unless-stopped
+  app:
+    user: "1000:1000"
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /var/www/html
+    env_file: .env
+    environment:
+      HOME: /tmp
+      XDG_CONFIG_HOME: /tmp/.config
+    volumes:
+      - ./app:/var/www/html
+      - ./data/storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [frontend, backend]
+    restart: unless-stopped
+  db:
+    image: mariadb:10.3
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    networks: [backend]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+networks:
+  frontend:
+  backend:
+    internal: true

@@ -1,0 +1,35 @@
+.env
+.env.*
+!.env.example
+/app/.env
+/app/vendor/
+/app/storage/
+/app/bootstrap/cache/*.php
+/data/
+/backups/
+/*.sql
+*.sql.gz
+.idea/
+.DS_Store
+
+# Recovered production-derived seed fixtures; may contain real customer/user data
+/app/database/seeds/*TableSeeder.php
+/app/database/seeds/UsersTableSeeder2.php
+
+# Local integration credentials and generated exports
+**/client_secret*.json
+**/*service-account*.json
+**/credentials*.json
+**/*.pem
+**/*.p12
+**/*.pfx
+**/*.key
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/*.bak
+**/*.backup
+**/*.dump
+**/*.log
+**/uploads/
+**/exports/
