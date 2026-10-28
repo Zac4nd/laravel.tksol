@@ -5,7 +5,7 @@ Recovered application: Laravel **5.5.50** (PHP legacy). Original SQL dumps: Mari
 **Warning:** PHP 7.4, MariaDB 10.3, and Laravel 5.5 are end-of-life. This environment is for **isolated recovery/testing only**, not for public production deployment. No application migration to PHP 8.4 has yet been performed.
 
 ## Contents
-- `app/`: Laravel production snapshot, with restored Composer manifests. `vendor/` ignored but copied locally for offline recovery.
+- `app/`: Laravel production snapshot, with restored Composer manifests. `vendor/` is ignored; Docker builds it through Composer, while the recovered local copy remains available for investigation.
 - `docker/`: PHP-FPM and Nginx configuration.
 - `data/storage/`: recovered application files (not tracked).
 - `data/mariadb/`: persistent DB (not tracked).
@@ -27,6 +27,8 @@ docker compose exec -T db sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MY
 The SQL dump contains statements requiring elevated privileges. The restore therefore uses the DB container administrator, only for import.
 
 To load **production** data (contains sensitive/personal data), substitute `database-production.sql` and use only a secured authorized environment.
+
+For a fresh checkout, create `.env` from `.env.example`, replace both database passwords and generate an APP_KEY (`base64:` followed by `openssl rand -base64 32`) before starting Compose. Keep `.env` out of Git.
 
 The database is *not* automatically overwritten by `up`. Restore into a fresh data directory only after taking a backup.
 

@@ -22,7 +22,6 @@ services:
       HOME: /tmp
       XDG_CONFIG_HOME: /tmp/.config
     volumes:
-      - ./app:/var/www/html
       - ./data/storage:/var/www/html/storage
     depends_on:
       db:
